@@ -27,8 +27,8 @@ public class LocationController {
     }
     
     @DeleteMapping("/")
-    void delete(@RequestParam double longitude, @RequestParam double latitude) {
-        locationRepository.delete(locationRepository.findByLatitudeAndLongitude(latitude, longitude));
+    void delete(@RequestBody Location location) {
+        locationRepository.delete(locationRepository.findByLatitudeAndLongitude(location.getLatitude(), location.getLongitude()));
     }
     
 }

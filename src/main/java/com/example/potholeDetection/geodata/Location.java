@@ -33,10 +33,12 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column(name="latitude", nullable = false)
-    private double latitude;
 
     @Column(name="longitude",nullable = false)
     private double longitude;
+
+    @Column(name="latitude", nullable = false)
+    private double latitude;
+
 
 }

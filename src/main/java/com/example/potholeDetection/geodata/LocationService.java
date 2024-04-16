@@ -35,16 +35,25 @@ public class LocationService {
     }
 
     public void create(Location location) {
-
-        //checking for duplicate according to distance is pending
+         //checking for duplicate according to distance is pending
         //if(locationRepository.findByLatitudeAndLongitude(location.getLatitude(), location.getLongitude())==null){
-            
         locationRepository.save(location);
-        List<Centroid> centroids=kMeansClustering.implement(getAllLocations(), k);
+    }
 
-        // for(Centroid centroid:centroids){
-        //     centroidRepository.save(centroid);
-        //}
+    public void centroidAdd() {
+
+        try {
+            List<Centroid> centroids=kMeansClustering.findCentroids(getAllLocations(), k);
+            centroidRepository.deleteAll();
+            for(Centroid centroid:centroids){
+                centroidRepository.save(centroid);
+            }
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
     }
 
 }

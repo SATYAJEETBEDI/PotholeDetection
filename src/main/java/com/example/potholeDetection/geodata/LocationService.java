@@ -38,6 +38,7 @@ public class LocationService {
          //checking for duplicate according to distance is pending
         //if(locationRepository.findByLatitudeAndLongitude(location.getLatitude(), location.getLongitude())==null){
         locationRepository.save(location);
+        // locationRepository.deleteAll();
     }
 
     public void centroidAdd() {

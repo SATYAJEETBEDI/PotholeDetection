@@ -5,6 +5,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
 import com.example.potholeDetection.geodata.Location;
 import com.google.maps.DistanceMatrixApi;
 import com.google.maps.DistanceMatrixApiRequest;
@@ -18,14 +22,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class DistanceCalculatorService {
 
-
-    private static final String API_KEY = "YOUR_API_KEY";
-    public static float[][] distances;
-    public static float[][] times;
-    public static String[] cities = {"", "Bengaluru", "Chennai", "Goa", "Mumbai", "Hyderabad", "Kolkata", "Patna", "Delhi", "Jaipur,+Rajasthan", "Lukhnow"};
-    public static final int n= cities.length;
-
-
     //downloading the data
     public  void getData(Location source,Location destination) throws Exception {
         String API_KEY = "AIzaSyA8XQE8uI2ZiJp2ztuxPFSRS7sa38cBtI0"; // Replace with your actual API key
@@ -33,10 +29,8 @@ public class DistanceCalculatorService {
         // System.out.println(sourceLat);
         double sourceLng = source.getLongitude();
         // System.out.println(sourceLng);
-
         double destLat = destination.getLatitude();
         // System.out.println(destLat);
-
         double destLng = destination.getLongitude();
         // System.out.println(destLng);
 
@@ -48,8 +42,28 @@ public class DistanceCalculatorService {
                                  .build();
         
         var client = HttpClient.newBuilder().build();
-        var response = client.send(request, HttpResponse.BodyHandlers.ofString()).body();        
-        System.out.println(response);
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString()).body(); 
+
+        long distance = -1L;
+        long time = -1L;
+
+        //parsing json data and updating data
+        JSONParser jp = new JSONParser();
+        JSONObject jo = (JSONObject) jp.parse(response);
+        JSONArray ja = (JSONArray) jo.get("rows");
+        jo = (JSONObject) ja.get(0);
+        ja = (JSONArray) jo.get("elements");
+        jo = (JSONObject) ja.get(0);
+        JSONObject je = (JSONObject) jo.get("distance");
+        JSONObject jf = (JSONObject) jo.get("duration");
+        distance = (long) je.get("value");
+        time = (long) jf.get("value");
+
+        System.out.println("Distance is " + distance + " meters");
+        System.out.println("Time is " + time + " seconds");
+
+        }       
+        // System.out.println(response);
     }
     
         //return response;
@@ -75,4 +89,3 @@ public class DistanceCalculatorService {
         
          //}
     
-}

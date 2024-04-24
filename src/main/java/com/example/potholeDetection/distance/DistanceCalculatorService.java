@@ -53,7 +53,7 @@ public class DistanceCalculatorService {
         var client = HttpClient.newBuilder().build();
         var response = client.send(request, HttpResponse.BodyHandlers.ofString()).body(); 
 
-        System.err.println(response);
+        // System.err.println(response);
         // Parse the JSON response
         JSONParser jp = new JSONParser();
         JSONObject jo = (JSONObject) jp.parse(response);
@@ -66,9 +66,8 @@ public class DistanceCalculatorService {
             JSONObject element = (JSONObject) ja.get(i);
             JSONObject distanceElement = (JSONObject) element.get("distance");
             long distance = (long) distanceElement.get("value");
-
             if (distance < 100) {
-                return "Pothole Ahead at destination. Slow Down!";
+                return "Pothole Ahead.Slow Down!";
             } 
             // else {
             //     result.append("No Pothole Ahead at destination " + (i + 1) + ".\n");

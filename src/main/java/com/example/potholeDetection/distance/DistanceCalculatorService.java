@@ -10,21 +10,20 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import com.example.potholeDetection.geodata.Location;
-import com.google.maps.DistanceMatrixApi;
-import com.google.maps.DistanceMatrixApiRequest;
-import com.google.maps.GeoApiContext;
-import com.google.maps.model.DistanceMatrix;
-import com.google.maps.model.LatLng;
-import com.google.maps.model.TravelMode;
-import com.google.maps.model.Unit;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DistanceCalculatorService {
 
+    @Autowired
+    DistanceConfig distanceConfig;
+
+
     //downloading the data
     public  void getData(Location source,Location destination) throws Exception {
-        String API_KEY = "AIzaSyA8XQE8uI2ZiJp2ztuxPFSRS7sa38cBtI0"; // Replace with your actual API key
+
+        String API_KEY=distanceConfig.getAPI_KEY(); // Replace with your actual API key
         double sourceLat = source.getLatitude();
         // System.out.println(sourceLat);
         double sourceLng = source.getLongitude();

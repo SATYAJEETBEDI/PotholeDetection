@@ -18,7 +18,7 @@ public class DistanceController {
     }
 
     @GetMapping("/live")
-    public void alert(@RequestBody Location location) {
-         distanceService.calculate(location);;
+    public String alert(@RequestBody Location location) {
+         return distanceService.calculate(location);
     }
 }

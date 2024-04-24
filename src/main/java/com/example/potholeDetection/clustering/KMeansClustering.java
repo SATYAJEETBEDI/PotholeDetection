@@ -1,9 +1,7 @@
 package com.example.potholeDetection.clustering;
 
-import weka.clusterers.ClusterEvaluation;
 import weka.clusterers.SimpleKMeans;
 import weka.core.Instances;
-import weka.core.converters.ConverterUtils.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,9 +1,11 @@
 package com.example.potholeDetection.distance;
 
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -13,27 +15,35 @@ import com.example.potholeDetection.geodata.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class DistanceCalculatorService {
 
     @Autowired
     DistanceConfig distanceConfig;
 
+    // Downloading the data
+    public String getData(Location source, List<Location> destinations) throws Exception {
 
-    //downloading the data
-    public  void getData(Location source,Location destination) throws Exception {
-
-        String API_KEY=distanceConfig.getAPI_KEY(); // Replace with your actual API key
+        String API_KEY = distanceConfig.getAPI_KEY();
         double sourceLat = source.getLatitude();
-        // System.out.println(sourceLat);
         double sourceLng = source.getLongitude();
-        // System.out.println(sourceLng);
-        double destLat = destination.getLatitude();
-        // System.out.println(destLat);
-        double destLng = destination.getLongitude();
-        // System.out.println(destLng);
 
-        String url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + sourceLat + "," +  sourceLng+ "&destinations=" + destLat + "," + destLng + "&key=" + API_KEY;
+        // Construct destinations part of the URL
+        StringBuilder destinationsPart = new StringBuilder();
+        for (Location destination : destinations) {
+            if (destinationsPart.length() > 0) {
+                destinationsPart.append("|");
+            }
+            destinationsPart.append(destination.getLatitude()).append(",").append(destination.getLongitude());
+        }
+
+        String encodedDestinations = URLEncoder.encode(destinationsPart.toString(), StandardCharsets.UTF_8.toString());
+
+        String url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=" +
+                     sourceLat + "," + sourceLng + "&destinations=" + encodedDestinations +
+                     "&key=" + API_KEY;
         
         var request = HttpRequest.newBuilder()
                                  .GET()
@@ -43,48 +53,28 @@ public class DistanceCalculatorService {
         var client = HttpClient.newBuilder().build();
         var response = client.send(request, HttpResponse.BodyHandlers.ofString()).body(); 
 
-        long distance = -1L;
-        long time = -1L;
-
-        //parsing json data and updating data
+        System.err.println(response);
+        // Parse the JSON response
         JSONParser jp = new JSONParser();
         JSONObject jo = (JSONObject) jp.parse(response);
         JSONArray ja = (JSONArray) jo.get("rows");
         jo = (JSONObject) ja.get(0);
         ja = (JSONArray) jo.get("elements");
-        jo = (JSONObject) ja.get(0);
-        JSONObject je = (JSONObject) jo.get("distance");
-        JSONObject jf = (JSONObject) jo.get("duration");
-        distance = (long) je.get("value");
-        time = (long) jf.get("value");
 
-        System.out.println("Distance is " + distance + " meters");
-        System.out.println("Time is " + time + " seconds");
+        // Assess each destination
+        for (int i = 0; i < ja.size(); i++) {
+            JSONObject element = (JSONObject) ja.get(i);
+            JSONObject distanceElement = (JSONObject) element.get("distance");
+            long distance = (long) distanceElement.get("value");
 
-        }       
-        // System.out.println(response);
+            if (distance < 100) {
+                return "Pothole Ahead at destination. Slow Down!";
+            } 
+            // else {
+            //     result.append("No Pothole Ahead at destination " + (i + 1) + ".\n");
+            // }
+        }
+
+        return "No Pothole Ahead";
     }
-    
-        //return response;
-
-
-    //public double getDistance(Location origin, Location destination) {
-        // DistanceMatrixApiRequest request = DistanceMatrixApi.newRequest(geoApiContext)
-        //         .origins(new LatLng(origin.getLatitude(), origin.getLongitude()))
-        //         .destinations(new LatLng(destination.getLatitude(), destination.getLongitude()))
-        //         .mode(TravelMode.DRIVING)
-        //         .units(Unit.METRIC);
-    
-        // try {
-        //     DistanceMatrix matrix = request.await();
-        //     if (matrix.rows.length == 0 || matrix.rows[0].elements.length == 0) {
-        //         // No distance information available
-        //         return -1;
-        //     }
-        //     return matrix.rows[0].elements[0].distance.inMeters;
-        // } catch (Exception e) {
-        //     e.printStackTrace();
-        //     return -1;
-        
-         //}
-    
+}

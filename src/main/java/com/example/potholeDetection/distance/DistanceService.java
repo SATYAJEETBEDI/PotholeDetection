@@ -1,6 +1,5 @@
 package com.example.potholeDetection.distance;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -22,21 +21,26 @@ public class DistanceService {
 
     
 
-    public void calculate(Location destination) {
-        List<Location> allLocation=locationRepository.findAll();
-        List<Double> toPrint=new ArrayList<>();
-        for(Location location:allLocation){
+
+    public String calculate(Location source) {
+        List<Location> allLocations = locationRepository.findAll();
+        final int BATCH_SIZE = 25;
+        String response = "No Pothole Ahead.";
+    
+        for (int i = 0; i < allLocations.size(); i += BATCH_SIZE) {
+            int end = Math.min(i + BATCH_SIZE, allLocations.size());
+            List<Location> batch = allLocations.subList(i, end);
             try {
-                distanceCalculatorService.getData(location, destination);
+                String batchResponse = distanceCalculatorService.getData(source, batch);
+                if (batchResponse=="Pothole Ahead.Slow Down!") {
+                    return batchResponse; // Immediately return if a pothole is detected in any batch
+                }
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            // toPrint.add(distance);
-            // System.out.println("Distance is "+distance);
         }
-        // for(Double d:toPrint){
-        //     System.out.println(d);
-        // }
+    
+        return response; // Return "No Pothole Ahead." if no batches detect a pothole
     }
+    
 }

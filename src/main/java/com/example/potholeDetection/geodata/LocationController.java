@@ -30,8 +30,8 @@ public class LocationController {
 
 
     @PostMapping("/")
-    void create(@RequestBody Location location) {
-        locationService.create(location);
+    String create(@RequestBody Location location) {
+        return locationService.create(location);
     }
 
     @GetMapping("/centroid")

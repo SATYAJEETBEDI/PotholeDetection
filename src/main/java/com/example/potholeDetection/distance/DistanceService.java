@@ -32,7 +32,7 @@ public class DistanceService {
             List<Location> batch = allLocations.subList(i, end);
             try {
                 String batchResponse = distanceCalculatorService.getData(source, batch);
-                if (batchResponse=="Pothole Ahead.Slow Down!") {
+                if (batchResponse=="Pothole Ahead") {
                     return batchResponse; // Immediately return if a pothole is detected in any batch
                 }
             } catch (Exception e) {

@@ -28,7 +28,7 @@ public class LocationService {
     }
 
 
-
+    
     public List<Location> getAllLocations() {
         return locationRepository.findAll();
     }
@@ -65,7 +65,6 @@ public class LocationService {
             }
 
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
